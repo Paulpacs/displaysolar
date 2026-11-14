@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Paulpacs Solar - Gauges</title>
+<title>Paulpacs Solar - Gauges + Chart</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -10,9 +10,7 @@
     margin: 0; min-height: 100vh; overflow-x: hidden;
     font-family: system-ui, -apple-system, sans-serif; color: #fff;
   }
-  .header {
-    text-align: center; padding: 18px 10px 4px;
-  }
+  .header { text-align: center; padding: 18px 10px 4px; }
   .header h1 {
     margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 4px;
     color: #fff; text-shadow: 0 0 18px rgba(48,229,255,.5);
@@ -48,84 +46,70 @@
   }
   .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
-  /* circular gauge container */
-  .gauge-wrap {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 6px;
-  }
-  .gauge {
-    position: relative; width: 200px; height: 200px;
-  }
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .gauge { position: relative; width: 200px; height: 200px; }
   .gauge svg { width: 100%; height: 100%; transform: rotate(135deg); }
   .gauge .track { fill: none; stroke: rgba(255,255,255,.07); stroke-linecap: round; }
   .gauge .value-arc { fill: none; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
   .gauge-center {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center;
+    align-items: center; justify-content: center; text-align: center;
   }
-  .gauge-center .num {
-    font-size: 34px; font-weight: 900; line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .gauge-center .unit {
-    font-size: 12px; font-weight: bold; opacity: .8; margin-top: 2px;
-  }
-  .gauge-center .sub {
-    font-size: 10px; opacity: .6; margin-top: 4px; letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+  .gauge-center .num { font-size: 34px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .gauge-center .unit { font-size: 12px; font-weight: bold; opacity: .8; margin-top: 2px; }
+  .gauge-center .sub { font-size: 10px; opacity: .6; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
 
-  /* horizontal bar meter */
-  .meter {
-    margin-top: 6px;
-  }
+  .meter { margin-top: 6px; }
   .meter-label {
     display: flex; justify-content: space-between;
     font-size: 10px; font-weight: 800; letter-spacing: 1px;
     text-transform: uppercase; margin-bottom: 5px; opacity: .85;
   }
-  .meter-track {
-    height: 14px; border-radius: 7px;
-    background: rgba(255,255,255,.08); overflow: hidden;
-    position: relative;
-  }
-  .meter-fill {
-    height: 100%; border-radius: 7px; width: 0%;
-    transition: width .6s ease;
-    box-shadow: 0 0 10px currentColor;
-  }
+  .meter-track { height: 14px; border-radius: 7px; background: rgba(255,255,255,.08); overflow: hidden; position: relative; }
+  .meter-fill { height: 100%; border-radius: 7px; width: 0%; transition: width .6s ease; box-shadow: 0 0 10px currentColor; }
 
-  /* stat rows */
-  .stats {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;
-  }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
   .stat {
     background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.07);
     border-radius: 8px; padding: 8px 10px;
   }
-  .stat .k {
-    font-size: 9px; font-weight: 800; letter-spacing: 1px;
-    text-transform: uppercase; opacity: .6;
-  }
-  .stat .v {
-    font-size: 16px; font-weight: 900; margin-top: 2px;
-    font-variant-numeric: tabular-nums;
-  }
+  .stat .k { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: .6; }
+  .stat .v { font-size: 16px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .stat .v small { font-size: 10px; font-weight: bold; opacity: .7; }
 
   .status-on { color: #4cffb0; }
   .status-off { color: #ff4d4d; }
   .status-idle { color: #888; }
 
-  /* two gauges side by side */
-  .gauge-row {
-    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
-  }
+  .gauge-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
   .gauge-row .gauge { width: 150px; height: 150px; }
   .gauge-row .gauge-center .num { font-size: 26px; }
+
+  /* ---- FULL-WIDTH CHART PANEL ---- */
+  .chart-panel {
+    grid-column: 1 / -1;
+    padding: 16px 18px 18px;
+  }
+  .chart-head {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 10px; margin-bottom: 10px;
+  }
+  .chart-head .panel-title { margin: 0; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    opacity: .85;
+  }
+  .legend-swatch { width: 14px; height: 4px; border-radius: 2px; }
+  .chart-wrapper {
+    position: relative; height: 260px; width: 100%;
+  }
+  .chart-wrapper canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+  }
 
   footer {
     text-align: center; padding: 10px 0 22px;
@@ -147,13 +131,10 @@
   <div class="panel">
     <div class="panel-title"><span class="dot" style="background:#30e5ff"></span>PV SYSTEM</div>
     <div class="gauge-wrap">
-      <div class="gauge" id="pvGauge">
+      <div class="gauge">
         <svg viewBox="0 0 200 200">
-          <circle class="track" cx="100" cy="100" r="85" stroke-width="14"
-                  stroke-dasharray="400 534"></circle>
-          <circle class="value-arc" id="pvArc" cx="100" cy="100" r="85"
-                  stroke="#30e5ff" stroke-width="14" stroke-dasharray="400 534"
-                  stroke-dashoffset="400"></circle>
+          <circle class="track" cx="100" cy="100" r="85" stroke-width="14" stroke-dasharray="400 534"></circle>
+          <circle class="value-arc" id="pvArc" cx="100" cy="100" r="85" stroke="#30e5ff" stroke-width="14" stroke-dasharray="400 534" stroke-dashoffset="400"></circle>
         </svg>
         <div class="gauge-center">
           <div class="num" id="pvPower">0</div>
@@ -174,13 +155,10 @@
   <div class="panel">
     <div class="panel-title"><span class="dot" style="background:#a6ff70"></span>BATTERY</div>
     <div class="gauge-wrap">
-      <div class="gauge" id="socGauge">
+      <div class="gauge">
         <svg viewBox="0 0 200 200">
-          <circle class="track" cx="100" cy="100" r="85" stroke-width="14"
-                  stroke-dasharray="400 534"></circle>
-          <circle class="value-arc" id="socArc" cx="100" cy="100" r="85"
-                  stroke="#a6ff70" stroke-width="14" stroke-dasharray="400 534"
-                  stroke-dashoffset="400"></circle>
+          <circle class="track" cx="100" cy="100" r="85" stroke-width="14" stroke-dasharray="400 534"></circle>
+          <circle class="value-arc" id="socArc" cx="100" cy="100" r="85" stroke="#a6ff70" stroke-width="14" stroke-dasharray="400 534" stroke-dashoffset="400"></circle>
         </svg>
         <div class="gauge-center">
           <div class="num" id="soc">0</div>
@@ -201,13 +179,10 @@
   <div class="panel">
     <div class="panel-title"><span class="dot" style="background:#a6ff70"></span>INVERTER LOAD</div>
     <div class="gauge-wrap">
-      <div class="gauge" id="invGauge">
+      <div class="gauge">
         <svg viewBox="0 0 200 200">
-          <circle class="track" cx="100" cy="100" r="85" stroke-width="14"
-                  stroke-dasharray="400 534"></circle>
-          <circle class="value-arc" id="invArc" cx="100" cy="100" r="85"
-                  stroke="#a6ff70" stroke-width="14" stroke-dasharray="400 534"
-                  stroke-dashoffset="400"></circle>
+          <circle class="track" cx="100" cy="100" r="85" stroke-width="14" stroke-dasharray="400 534"></circle>
+          <circle class="value-arc" id="invArc" cx="100" cy="100" r="85" stroke="#a6ff70" stroke-width="14" stroke-dasharray="400 534" stroke-dashoffset="400"></circle>
         </svg>
         <div class="gauge-center">
           <div class="num" id="invLoad">0</div>
@@ -230,13 +205,10 @@
   <div class="panel">
     <div class="panel-title"><span class="dot" id="gridDot" style="background:#ff4d4d"></span>GRID</div>
     <div class="gauge-wrap">
-      <div class="gauge" id="gridGauge">
+      <div class="gauge">
         <svg viewBox="0 0 200 200">
-          <circle class="track" cx="100" cy="100" r="85" stroke-width="14"
-                  stroke-dasharray="400 534"></circle>
-          <circle class="value-arc" id="gridArc" cx="100" cy="100" r="85"
-                  stroke="#ff4d4d" stroke-width="14" stroke-dasharray="400 534"
-                  stroke-dashoffset="400"></circle>
+          <circle class="track" cx="100" cy="100" r="85" stroke-width="14" stroke-dasharray="400 534"></circle>
+          <circle class="value-arc" id="gridArc" cx="100" cy="100" r="85" stroke="#ff4d4d" stroke-width="14" stroke-dasharray="400 534" stroke-dashoffset="400"></circle>
         </svg>
         <div class="gauge-center">
           <div class="num" id="gridPowerG">0</div>
@@ -255,42 +227,18 @@
     </div>
   </div>
 
-  <!-- WEATHER -->
-  <div class="panel">
-    <div class="panel-title"><span class="dot" style="background:#ffc247"></span>WEATHER</div>
-    <div class="gauge-row">
-      <div class="gauge">
-        <svg viewBox="0 0 200 200">
-          <circle class="track" cx="100" cy="100" r="85" stroke-width="14"
-                  stroke-dasharray="400 534"></circle>
-          <circle class="value-arc" id="tempArc" cx="100" cy="100" r="85"
-                  stroke="#ffc247" stroke-width="14" stroke-dasharray="400 534"
-                  stroke-dashoffset="400"></circle>
-        </svg>
-        <div class="gauge-center">
-          <div class="num" id="feels">--</div>
-          <div class="unit">°C</div>
-          <div class="sub">FEELS LIKE</div>
-        </div>
-      </div>
-      <div class="gauge">
-        <svg viewBox="0 0 200 200">
-          <circle class="track" cx="100" cy="100" r="85" stroke-width="14"
-                  stroke-dasharray="400 534"></circle>
-          <circle class="value-arc" id="rainArc" cx="100" cy="100" r="85"
-                  stroke="#30e5ff" stroke-width="14" stroke-dasharray="400 534"
-                  stroke-dashoffset="400"></circle>
-        </svg>
-        <div class="gauge-center">
-          <div class="num" id="rain">--</div>
-          <div class="unit">%</div>
-          <div class="sub">RAIN CHANCE</div>
-        </div>
+  <!-- FULL-WIDTH CHART: PV / Inverter / Grid Power -->
+  <div class="panel chart-panel">
+    <div class="chart-head">
+      <div class="panel-title"><span class="dot" style="background:#30e5ff"></span>POWER HISTORY</div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#30e5ff"></span>PV Power</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#a6ff70"></span>Inverter Power</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#ff4d4d"></span>Grid Power</div>
       </div>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="k">Wind</div><div class="v" id="wind" style="font-size:13px">--</div></div>
-      <div class="stat"><div class="k">Sun</div><div class="v" id="sun" style="font-size:11px">--:-- → --:--</div></div>
+    <div class="chart-wrapper">
+      <canvas id="powerChart"></canvas>
     </div>
   </div>
 
@@ -308,48 +256,141 @@ function tick() {
 }
 setInterval(tick, 1000); tick();
 
-/* ---------- ARC GAUGE HELPER ----------
-   Semi-circle arc of 270°, radius 85, circumference = 2π·85 ≈ 534.
-   We draw 75% of it → 400 units. Min/max configurable per gauge.        */
+/* ---------- ARC GAUGE HELPER ---------- */
 const ARC_LEN = 400;
-const ARC_FULL = 534;
-
 function setArc(arcId, frac, color) {
   const el = document.getElementById(arcId);
   const f = Math.max(0, Math.min(1, frac));
-  // draw from empty (offset = ARC_LEN) to full (offset = 0)
   el.style.strokeDashoffset = ARC_LEN - (ARC_LEN * f);
   if (color) el.setAttribute('stroke', color);
 }
 
+/* ---------- MULTI-LINE CHART ----------
+   Tracks PV, Inverter and Grid power over time.
+   One shared canvas, three colored lines, dynamic Y scale. */
+const MAX_POINTS = 60;   // rolling window of last 60 samples (~60 min at 60s poll)
+const series = {
+  pv:    { data: [], color: '#30e5ff', fill: 'rgba(48,229,255,0.08)'  },
+  inv:   { data: [], color: '#a6ff70', fill: 'rgba(166,255,112,0.08)' },
+  grid:  { data: [], color: '#ff4d4d', fill: 'rgba(255,77,77,0.08)'   }
+};
+
+const chartCanvas = document.getElementById('powerChart');
+const chartCtx = chartCanvas.getContext('2d');
+
+function resizeChart() {
+  const dpr = window.devicePixelRatio || 1;
+  chartCanvas.width  = chartCanvas.clientWidth  * dpr;
+  chartCanvas.height = chartCanvas.clientHeight * dpr;
+  chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawChart();
+}
+window.addEventListener('resize', resizeChart);
+
+function drawChart() {
+  const w = chartCanvas.clientWidth;
+  const h = chartCanvas.clientHeight;
+  const padL = 46, padR = 12, padT = 12, padB = 22;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  chartCtx.clearRect(0, 0, w, h);
+
+  // Determine dynamic max across all series
+  let maxVal = 100;
+  Object.values(series).forEach(s => {
+    s.data.forEach(v => { if (v > maxVal) maxVal = v; });
+  });
+  maxVal = Math.ceil(maxVal / 500) * 500;   // round up to nearest 500 W
+
+  // Grid lines + Y labels
+  chartCtx.font = '10px system-ui';
+  chartCtx.textAlign = 'right';
+  chartCtx.textBaseline = 'middle';
+  chartCtx.lineWidth = 1;
+  chartCtx.setLineDash([3, 3]);
+  const steps = 4;
+  for (let i = 0; i <= steps; i++) {
+    const val = (maxVal / steps) * i;
+    const y = padT + plotH - (plotH * (i / steps));
+    chartCtx.strokeStyle = 'rgba(255,255,255,0.08)';
+    chartCtx.beginPath();
+    chartCtx.moveTo(padL, y);
+    chartCtx.lineTo(w - padR, y);
+    chartCtx.stroke();
+    chartCtx.fillStyle = 'rgba(255,255,255,0.4)';
+    chartCtx.fillText(Math.round(val) + ' W', padL - 6, y);
+  }
+  chartCtx.setLineDash([]);
+
+  // X-axis baseline
+  chartCtx.strokeStyle = 'rgba(255,255,255,0.15)';
+  chartCtx.beginPath();
+  chartCtx.moveTo(padL, padT + plotH);
+  chartCtx.lineTo(w - padR, padT + plotH);
+  chartCtx.stroke();
+
+  // Plot each series
+  Object.values(series).forEach(s => {
+    const data = s.data;
+    if (data.length < 1) return;
+
+    const xFor = i => padL + (i / (MAX_POINTS - 1)) * plotW;
+    const yFor = v => padT + plotH - (Math.min(v, maxVal) / maxVal) * plotH;
+
+    // filled area
+    chartCtx.beginPath();
+    chartCtx.moveTo(xFor(0), yFor(data[0]));
+    for (let i = 1; i < data.length; i++) chartCtx.lineTo(xFor(i), yFor(data[i]));
+    chartCtx.lineTo(xFor(data.length - 1), padT + plotH);
+    chartCtx.lineTo(xFor(0), padT + plotH);
+    chartCtx.closePath();
+    chartCtx.fillStyle = s.fill;
+    chartCtx.fill();
+
+    // line
+    chartCtx.beginPath();
+    for (let i = 0; i < data.length; i++) {
+      const x = xFor(i), y = yFor(data[i]);
+      i ? chartCtx.lineTo(x, y) : chartCtx.moveTo(x, y);
+    }
+    chartCtx.strokeStyle = s.color;
+    chartCtx.lineWidth = 2;
+    chartCtx.lineJoin = 'round';
+    chartCtx.lineCap = 'round';
+    chartCtx.stroke();
+
+    // latest point dot
+    const lastX = xFor(data.length - 1);
+    const lastY = yFor(data[data.length - 1]);
+    chartCtx.beginPath();
+    chartCtx.arc(lastX, lastY, 3.5, 0, Math.PI * 2);
+    chartCtx.fillStyle = s.color;
+    chartCtx.fill();
+    chartCtx.strokeStyle = 'rgba(0,0,0,0.6)';
+    chartCtx.lineWidth = 1;
+    chartCtx.stroke();
+  });
+
+  // X-axis label (right side = now)
+  chartCtx.fillStyle = 'rgba(255,255,255,0.35)';
+  chartCtx.textAlign = 'right';
+  chartCtx.textBaseline = 'top';
+  chartCtx.fillText('NOW', w - padR, padT + plotH + 5);
+  chartCtx.textAlign = 'left';
+  chartCtx.fillText('-' + MAX_POINTS + ' samples', padL, padT + plotH + 5);
+}
+
+function pushSample(pv, inv, grid) {
+  [ [series.pv, pv], [series.inv, inv], [series.grid, grid] ].forEach(([s, v]) => {
+    s.data.push(v);
+    if (s.data.length > MAX_POINTS) s.data.shift();
+  });
+  drawChart();
+}
+
 /* ---------- DATA ---------- */
 const pvMax = 2000, invMax = 2000, gridMax = 2000, socMax = 100;
-
-async function fetchWeather() {
-  try {
-    const url = "https://api.open-meteo.com/v1/forecast?latitude=9.312079&longitude=123.292652&current=apparent_temperature,precipitation_probability,wind_speed_10m,wind_direction_10m&daily=sunrise,sunset&timezone=Asia%2FManila";
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.current) {
-      const feels = data.current.apparent_temperature;
-      document.getElementById('feels').textContent = feels.toFixed(1);
-      setArc('tempArc', (feels - 15) / 25);   // map 15–40 °C → 0–1
-      const rain = data.current.precipitation_probability;
-      document.getElementById('rain').textContent = rain;
-      setArc('rainArc', rain / 100);
-      const spd = data.current.wind_speed_10m.toFixed(1);
-      const deg = data.current.wind_direction_10m || 0;
-      const dirs = ['N','NE','E','SE','S','SW','W','NW'];
-      const dir = dirs[Math.round(deg / 45) % 8];
-      document.getElementById('wind').innerHTML = `${spd} <small>km/h ${dir}</small>`;
-    }
-    if (data.daily) {
-      const sr = data.daily.sunrise[0].split('T')[1];
-      const ss = data.daily.sunset[0].split('T')[1];
-      document.getElementById('sun').textContent = `${sr} → ${ss}`;
-    }
-  } catch (e) { console.warn('Weather failed', e); }
-}
 
 async function fetchData() {
   try {
@@ -386,7 +427,6 @@ async function fetchData() {
     setArc('socArc', soc / socMax);
     document.getElementById('battVolt').textContent = battVolt.toFixed(2);
 
-    /* charge current */
     const totalLoad = invPower + (invPower > 0 ? 100 : 0);
     const diff = pvPower - totalLoad;
     const ampsEl = document.getElementById('battAmps');
@@ -429,14 +469,18 @@ async function fetchData() {
     document.getElementById('floor1Bar').style.width = Math.min(100, (floor1 / gridMax) * 100) + '%';
     document.getElementById('floor2Bar').style.width = Math.min(100, (floor2 / gridMax) * 100) + '%';
 
+    /* Push to multi-line chart */
+    pushSample(pvPower, invPower, gridPower);
+
   } catch (e) {
     console.error('Data fetch failed', e);
   }
 }
 
-fetchData(); fetchWeather();
+/* init chart once layout is ready */
+requestAnimationFrame(() => { resizeChart(); });
+fetchData();
 setInterval(fetchData, 60000);
-setInterval(fetchWeather, 600000);
 </script>
 </body>
 </html>
